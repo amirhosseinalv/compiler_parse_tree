@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "ScopeTest",
+      "request": "launch",
+      "mainClass": "ofp.ScopeTest",
+      "projectName": "Assignment_2_27b0d724"
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "ofp.Main",
+      "projectName": "Assignment_2_27b0d724"
+    },
+    {
+      "type": "antlr-debug",
+      "request": "launch",
+      "name": "Debug Assignment_2 grammar",
+      "grammar": "${workspaceFolder}/ofp.g4",
+      "input": "${workspaceFolder}/Assignment_2_input.txt",
+      "startRule": "program",
+      "printParseTree": true,
+      "visualParseTree": true
+    },
+    {
+      "type": "java",
+      "name": "Run Assignment2Runner",
+      "request": "launch",
+      "mainClass": "Assignment2Runner",
+      "args": "Assignment_2_input.txt",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

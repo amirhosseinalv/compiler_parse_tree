@@ -1,0 +1,38 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    },
+  ],
+  "settings": {
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+      "lib/*.jar",
+    ],
+    "java.import.exclusions": ["**/.antlr/**"],
+    "antlr4.debug": {
+      "visualParseTreeHorizontal": true,
+      "visualParseTreeClustered": false,
+    },
+    "antlr4.generation": {
+      "outputDir": "/Users/amirhossein/University/4DT902-Compiler/Assignment_2/src/generated",
+      "mode": "external",
+      "language": "Java",
+      "listeners": true,
+      "visitors": true,
+    },
+    "launch": {
+      "configurations": [
+        {
+          "type": "antlr-debug",
+          "request": "launch",
+          "name": "Debug ofp grammar",
+          "grammar": "/Users/amirhossein/University/4DT902-Compiler/Assignment_2/ofp.g4",
+          "input": "/Users/amirhossein/University/4DT902-Compiler/Assignment_2/Assignment_2_input.txt",
+          "visualParseTree": true,
+        },
+      ],
+    },
+  },
+}

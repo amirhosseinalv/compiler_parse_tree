@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run Assignment1Runner",
+            "request": "launch",
+            "mainClass": "Assignment1Runner",
+            "args": "Assignment_1_input.txt",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

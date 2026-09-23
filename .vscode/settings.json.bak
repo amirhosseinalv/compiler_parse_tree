@@ -1,0 +1,15 @@
+{
+    // Only "src" holds Java sources. This keeps the language server from
+    // compiling the ANTLR extension's scratch copies in ".antlr", which
+    // declare "package generated" but do not live in a "generated" folder.
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "/Users/amirhossein/University/ANLT/java_install/antlr-complete.jar"
+    ],
+    "java.import.exclusions": [
+        "**/.antlr/**",
+        "**/node_modules/**",
+        "**/.metadata/**"
+    ]
+}

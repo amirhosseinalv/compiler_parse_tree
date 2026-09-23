@@ -1,0 +1,36 @@
+# Test program for the OFP grammar
+
+int sumUpTo(int n) {
+	int i = 1;
+	int sum = 0;
+	while (i < n + 1) {
+		sum = sum + i;
+		i = i + 1;
+	}
+	return sum;
+}
+
+int[] makeArray() {
+	return {1, 2, 3};
+}
+
+void main() {
+	int n = 10;
+	int[] arr = {1, 2, 3};
+	arr = {4, 5, 6};              # arrays can be re-assigned
+	arr = new int[5];
+	arr[0] = 42;
+	float f = 3.14;
+	char c = 'x';
+	bool b = true;
+	string s = "hello";
+	int res = sumUpTo(n);
+	println(res);                 # 55
+	if (res > 50) {
+		println("big");
+	} else
+		println("small");
+	while (n > 0)
+		n = n - 1;
+	println(arr.length);
+}
