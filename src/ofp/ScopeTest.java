@@ -20,13 +20,13 @@ public class ScopeTest {
         blockScope.define(x);
 
         OFPSymbol c = new OFPSymbol("a", OFPType.STRING);
-        blockScope.define(c);
+        functionScope.define(c);
 
         System.out.println("Global Scope: " + globalScope);
         System.out.println("resolv add in block: " + blockScope.resolve("add"));
         System.out.println("resolv locally add in block: " + blockScope.resolveLocally("add"));
         System.out.println("Function Scope resolv x: " + functionScope.resolve("x"));
-        System.out.println("Block Scope resolv a: " + blockScope.resolve("a"));
+        System.out.println("Block Scope resolv a: " + functionScope.resolve("a"));
         
     }
 }

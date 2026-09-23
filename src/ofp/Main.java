@@ -12,6 +12,7 @@ import java.io.IOException;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.gui.Trees;
 
 import generated.ofpLexer;
@@ -42,6 +43,9 @@ public class Main  {
         } 
         System.out.println("\nParsing completed");
 
+        ParseTreeWalker walker = new ParseTreeWalker();
+        PrintListener listener = new PrintListener();
+        walker.walk(listener, root);
         Trees.inspect(root, parser);
         
     }
