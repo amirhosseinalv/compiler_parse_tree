@@ -458,18 +458,6 @@ public class ofpBaseListener implements ofpListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCompareExpr(ofpParser.CompareExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterEqualExpr(ofpParser.EqualExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitEqualExpr(ofpParser.EqualExprContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

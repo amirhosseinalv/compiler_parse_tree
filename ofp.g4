@@ -56,7 +56,6 @@ expr
     | expr ('*' | '/') expr                                 # mulDivExpr
     | expr ('+' | '-') expr                                 # addSubExpr
     | expr ('<' | '>' | '==') expr                                 # compareExpr
-    | expr '==' expr                                        # equalExpr
     | funcCall                                              # callExpr
     | INT                                                   # intExpr
     | FLOAT                                                 # floatExpr

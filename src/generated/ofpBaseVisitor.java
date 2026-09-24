@@ -273,11 +273,4 @@ public class ofpBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements of
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitCompareExpr(ofpParser.CompareExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitEqualExpr(ofpParser.EqualExprContext ctx) { return visitChildren(ctx); }
 }

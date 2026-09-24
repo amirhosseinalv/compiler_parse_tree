@@ -435,16 +435,4 @@ public interface ofpListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCompareExpr(ofpParser.CompareExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code equalExpr}
-	 * labeled alternative in {@link ofpParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterEqualExpr(ofpParser.EqualExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code equalExpr}
-	 * labeled alternative in {@link ofpParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitEqualExpr(ofpParser.EqualExprContext ctx);
 }

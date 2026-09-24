@@ -262,11 +262,4 @@ public interface ofpVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCompareExpr(ofpParser.CompareExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code equalExpr}
-	 * labeled alternative in {@link ofpParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqualExpr(ofpParser.EqualExprContext ctx);
 }
