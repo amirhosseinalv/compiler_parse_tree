@@ -210,18 +210,6 @@ public interface ofpListener extends ParseTreeListener {
 	 */
 	void exitReturnStmt(ofpParser.ReturnStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code blockStmt}
-	 * labeled alternative in {@link ofpParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void enterBlockStmt(ofpParser.BlockStmtContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code blockStmt}
-	 * labeled alternative in {@link ofpParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void exitBlockStmt(ofpParser.BlockStmtContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code varDecl}
 	 * labeled alternative in {@link ofpParser#declaration}.
 	 * @param ctx the parse tree

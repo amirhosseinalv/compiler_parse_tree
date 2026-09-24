@@ -235,18 +235,6 @@ public class ofpBaseListener implements ofpListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBlockStmt(ofpParser.BlockStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBlockStmt(ofpParser.BlockStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterVarDecl(ofpParser.VarDeclContext ctx) { }
 	/**
 	 * {@inheritDoc}

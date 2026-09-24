@@ -131,13 +131,6 @@ public interface ofpVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturnStmt(ofpParser.ReturnStmtContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code blockStmt}
-	 * labeled alternative in {@link ofpParser#stmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBlockStmt(ofpParser.BlockStmtContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code varDecl}
 	 * labeled alternative in {@link ofpParser#declaration}.
 	 * @param ctx the parse tree

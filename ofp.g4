@@ -36,7 +36,7 @@ stmt
     | 'if' '(' expr ')' (stmt | block)
       ('else' (stmt | block))?                              # ifStmt
     | 'return' expr? ';'                                    # returnStmt
-    | block                                                 # blockStmt
+    // | block                                                 # blockStmt
     ;
 
 declaration
@@ -55,7 +55,7 @@ expr
     | '-' expr                                              # negExpr
     | expr ('*' | '/') expr                                 # mulDivExpr
     | expr ('+' | '-') expr                                 # addSubExpr
-    | expr ('<' | '>') expr                                 # compareExpr
+    | expr ('<' | '>' | '==') expr                                 # compareExpr
     | expr '==' expr                                        # equalExpr
     | funcCall                                              # callExpr
     | INT                                                   # intExpr
@@ -67,13 +67,11 @@ expr
     ;
 
 // ---------- Lexer ----------
-
-FLOAT   : ('0' | [1-9] [0-9]*) '.' [0-9]+ ;
-INT     : '0' | [1-9] [0-9]* ;
-BOOL    : 'true' | 'false' ;
-CHAR    : '\'' ~['\\\r\n] '\'' ;
-STRING  : '"' ~["\\\r\n]* '"' ;
-ID      : [a-zA-Z] [a-zA-Z0-9_]* ;
-
+INT   : '0' | [1-9][0-9]* ;
+FLOAT : ('0' | [1-9][0-9]*) '.' [0-9]+ ;       
+BOOL   : 'true' | 'false' ;
+CHAR   : '\'' [a-zA-Z!.,?=:() \t\r\n] '\'' ;             
+STRING : '"' [a-zA-Z!.,?=:() \t\r\n]* '"' ; 
+ID : [a-zA-Z]+ ; 
+WS : (' ' | '\t' | '\r' | '\n')+ -> skip ;
 COMMENT : '#' ~[\r\n]* -> skip ;
-WS      : [ \t\r\n]+ -> skip ;
