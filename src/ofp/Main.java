@@ -42,7 +42,16 @@ public class Main  {
         ParseTreeWalker walker = new ParseTreeWalker();
         PrintListener listener = new PrintListener();
         walker.walk(listener, root);
-        Trees.inspect(root, parser);
+        System.out.println("\nPrint listener completed");
+
+        SymbolTableListener symbolTableListener = new SymbolTableListener();
+        walker.walk(symbolTableListener, root);
+        System.out.println("\nSymbol table listener completed");
+        System.out.println("\nSymbol table listener error count: " + symbolTableListener.getErrorCount());
+        System.out.println("\nSymbol table listener scopes: " + symbolTableListener.getScopes().get(root));
+
+
+        // Trees.inspect(root, parser);
         
     }
 }

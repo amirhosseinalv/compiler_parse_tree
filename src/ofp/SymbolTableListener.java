@@ -121,6 +121,15 @@ public class SymbolTableListener extends ofpBaseListener {
 
         String arrayName = ctx.getChild(3).getText();
 
+        OFPSymbol arraySym = new OFPSymbol(arrayName, arrayType);
+        currentScope.define(arraySym);
     }
+
+    public ParseTreeProperty<OFPScope> getScopes(){
+        return scopes;
+    }
+    public int getErrorCount(){
+        return errorCount;
+    }
+
 }
-    
