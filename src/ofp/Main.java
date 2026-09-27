@@ -48,8 +48,8 @@ public class Main  {
         walker.walk(symbolTableListener, root);
         System.out.println("\nSymbol table listener completed");
         System.out.println("\nSymbol table listener error count: " + symbolTableListener.getErrorCount());
-        System.out.println("\nSymbol table listener scopes: " + symbolTableListener.getScopes().get(root));
-
+        OFPScope globalScope = symbolTableListener.getScopes().get(root);
+        globalScope.printTree(0);
 
         // Trees.inspect(root, parser);
         

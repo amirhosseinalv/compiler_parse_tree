@@ -5,15 +5,22 @@
  */
 
 package ofp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class OFPScope {
     private OFPScope enclosingScope; // null if global (outermost) scope
     private Map<String, OFPSymbol> symbols = new LinkedHashMap<>();
+    private final List<OFPScope> children = new ArrayList<>();
     public OFPScope(OFPScope enclosingScope){ 
         this.enclosingScope = enclosingScope;
+        if(enclosingScope != null){
+            enclosingScope.addChild(this);
+        }
     }   
+
     public OFPSymbol resolveLocally(String name){
         return symbols.get(name);
     }
@@ -37,8 +44,16 @@ public class OFPScope {
     public String toString(){
         return symbols.toString();
     }
-    // If a name cannot be resolved in this scope,
-    // try enclosing/parent scope recursively.
-    // If null is returned, name/identifier not found in the symbol table!
-    // Print the contents of this scope
+
+    public void addChild(OFPScope childScope){
+        children.add(childScope);
+    }
+
+    public void printTree(int depth){
+        System.out.println("- ".repeat(depth) + symbols.toString());
+        for (OFPScope child : children){
+            child.printTree(depth + 1);
+        }
+    }
+
 }
