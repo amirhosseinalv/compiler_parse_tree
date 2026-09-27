@@ -114,14 +114,13 @@ public class SymbolTableListener extends ofpBaseListener {
         currentScope.define(varSym);
     }
 
-    // @Override 
-    // public void enterArrayDecl(ofpParser.ArrayDeclContext ctx){
-    //     String arrayTypeString = ctx.getChild(0).getText() + "[]";
-    //     OFPType arrayType = OFPType.get(arrayTypeString);
+    @Override 
+    public void enterArrayDecl(ofpParser.ArrayDeclContext ctx){
+        String arrayTypeString = ctx.getChild(0).getText() + "[]";
+        OFPType arrayType = OFPType.get(arrayTypeString);
 
-    //     String arrayName = ctx.getChild(3).getText();
+        String arrayName = ctx.getChild(3).getText();
 
-    //     OFPSymbol arraySym = 
-    // }
+    }
 }
     
