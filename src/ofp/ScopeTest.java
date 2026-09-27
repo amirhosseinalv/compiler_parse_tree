@@ -1,3 +1,10 @@
+/**
+ * A standalone unit test for the symbol table infrastructure. It manually constructs 
+ * a hierarchy of scopes (global, function, and block) and populates them with symbols 
+ * to verify that hierarchical name resolution, local visibility rules, and symbol 
+ * shadowing work correctly independent of the ANTLR parsing process.
+ */
+
 package ofp;
 
 public class ScopeTest {

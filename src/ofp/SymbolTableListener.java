@@ -1,3 +1,9 @@
+/**
+ * The core semantic analyzer extending ofpBaseListener. It traverses the parse 
+ * tree to populate the symbol table, managing lexical scopes, functions, and 
+ * parameters by dynamically creating and linking OFPScope and OFPSymbol objects.
+ */
+
 package ofp;
 import generated.ofpParser;
 import generated.ofpBaseListener;

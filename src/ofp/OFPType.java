@@ -1,3 +1,9 @@
+/**
+ * Implements a Flyweight (or Type Registry) pattern to manage data types. It 
+ * ensures only a single, globally accessible instance exists for each primitive 
+ * type, allowing fast and efficient type comparisons using reference equality.
+ */
+
 package ofp;
 import java.util.HashMap;
 import java.util.Map;

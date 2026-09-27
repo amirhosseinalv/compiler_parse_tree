@@ -1,3 +1,9 @@
+/**
+ * Represents a parameter within a function signature. It extends OFPSymbol 
+ * strictly for semantic differentiation, allowing the compiler to easily 
+ * distinguish parameters from standard local variables during type checking.
+ */
+
 package ofp;
 
 public class OFPParamSymbol extends OFPSymbol {
