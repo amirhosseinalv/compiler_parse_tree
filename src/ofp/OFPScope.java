@@ -1,6 +1,12 @@
+/**
+ * Represents a lexical scope (or environment) in the code. It stores a map of 
+ * symbols declared within that specific block and maintains a reference to its 
+ * enclosing (parent) scope, enabling recursive hierarchical name resolution.
+ */
+
 package ofp;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class OFPScope {
     private OFPScope enclosingScope; // null if global (outermost) scope

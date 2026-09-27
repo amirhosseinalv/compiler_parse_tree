@@ -1,5 +1,10 @@
-package ofp;
+/**
+ * Represents a function declaration in the symbol table. Extending OFPSymbol, 
+ * it treats the inherited type as the return type and maintains an ordered list 
+ * of OFPParamSymbol objects representing the function's signature.
+ */
 
+package ofp;
 import java.util.ArrayList;
 import java.util.List;
 

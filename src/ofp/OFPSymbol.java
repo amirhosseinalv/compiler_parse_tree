@@ -1,3 +1,9 @@
+/**
+ * The base class for any declared entity in the OFP language. It stores 
+ * fundamental properties shared by all symbols, specifically the identifier 
+ * name and its associated OFPType.
+ */
+
 package ofp;
 
 public class OFPSymbol {

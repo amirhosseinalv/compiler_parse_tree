@@ -1,20 +1,16 @@
 /**
- * Main.java
- * 10 sep. 2023
- * jlnmsi
- * 
- * Starting point for the ofp compiler
+ * Entry point of the OFP compiler. It handles reading the input source file, 
+ * initializes the ANTLR lexer and parser, generates the parse tree, and 
+ * coordinates the tree traversal using a ParseTreeWalker to trigger listeners.
  */
+
 package ofp;
-
 import java.io.IOException;
-
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.gui.Trees;
-
 import generated.ofpLexer;
 import generated.ofpParser;
 
