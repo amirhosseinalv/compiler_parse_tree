@@ -51,7 +51,7 @@ public class Main  {
         OFPScope globalScope = symbolTableListener.getScopes().get(root);
         globalScope.printTree(0);
 
-        // Trees.inspect(root, parser);
+        //Trees.inspect(root, parser);
         
     }
 }

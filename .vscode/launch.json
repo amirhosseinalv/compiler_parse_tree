@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "ofp.Main",
+      "projectName": "compiler_parse_tree_42eee08f"
+    },
+    {
+      "type": "java",
       "name": "ScopeTest",
       "request": "launch",
       "mainClass": "ofp.ScopeTest",

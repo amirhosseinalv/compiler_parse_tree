@@ -6,14 +6,15 @@
 
 package ofp;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OFPScope {
     private OFPScope enclosingScope; // null if global (outermost) scope
     private Map<String, OFPSymbol> symbols = new LinkedHashMap<>();
     private final List<OFPScope> children = new ArrayList<>();
+
     public OFPScope(OFPScope enclosingScope){ 
         this.enclosingScope = enclosingScope;
         if(enclosingScope != null){
