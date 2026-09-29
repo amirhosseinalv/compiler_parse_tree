@@ -98,4 +98,53 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             return symbol.getType();
         }
     }
+
+
+    @Override 
+    public OFPType visitAddSubExpr(ofpParser.AddSubExprContext ctx){
+        OFPType lhs = visit(ctx.getChild(0));
+        OFPType rhs = visit(ctx.getChild(2));
+
+        if(rhs == OFPType.ERROR || lhs == OFPType.ERROR){
+            return OFPType.ERROR;
+        } else if(rhs != lhs) {
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
+            return lhs;
+        } else {
+            return rhs;
+        }
+    }
+
+    @Override 
+    public OFPType visitMulDivExpr(ofpParser.MulDivExprContext ctx) {
+        OFPType lhs = visit(ctx.getChild(0));
+        OFPType rhs = visit(ctx.getChild(2));
+
+        if(rhs == OFPType.ERROR || lhs == OFPType.ERROR){
+            return OFPType.ERROR;
+        } else if(rhs != lhs) {
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
+            return lhs;
+        } else {
+            return rhs;
+        }
+    }
+
+    @Override 
+    public OFPType visitCompareExpr(ofpParser.CompareExprContext ctx) {
+        OFPType lhs = visit(ctx.getChild(0));
+        OFPType rhs = visit(ctx.getChild(2));
+
+        if(rhs == OFPType.ERROR || lhs == OFPType.ERROR){
+            return OFPType.ERROR;
+        } else if(rhs != lhs) {
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
+            return OFPType.BOOL;
+        } else {
+            return OFPType.BOOL;
+        }
+    }
 } 
