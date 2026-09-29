@@ -18,7 +18,7 @@ public class Main  {
 
     public static void main(String[] args)  {
         System.out.println(OFPType.INT);
-        String testProgram = args.length > 0 ? args[0] : "test.ofp";
+        String testProgram = args.length > 0 ? args[0] : "test_duplicates.ofp";
         
         if ( !testProgram.endsWith(".ofp") ) {
             System.out.println("\nPrograms most end with suffix .ofp! Found "+testProgram);
@@ -51,7 +51,7 @@ public class Main  {
         OFPScope globalScope = symbolTableListener.getScopes().get(root);
         globalScope.printTree(0);
 
-        //Trees.inspect(root, parser);
+        // Trees.inspect(root, parser);
         
     }
 }
