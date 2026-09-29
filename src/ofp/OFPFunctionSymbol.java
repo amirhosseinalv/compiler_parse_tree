@@ -26,6 +26,14 @@ public class OFPFunctionSymbol extends OFPSymbol {
         return params;
     }
 
+    public List<OFPType> getParamTypes() {
+        List<OFPType> paramTypes = new ArrayList<>();
+        for (OFPParamSymbol param : params) {
+            paramTypes.add(param.getType());
+        }
+        return paramTypes;
+    }
+
     @Override
     public String toString() {
         return "FunctionSymbol(name=" + getName() + ", type=" + getType() + ", params=" + params + ")";
