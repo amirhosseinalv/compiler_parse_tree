@@ -1,4 +1,4 @@
-// Generated from c://Users//fdrag//OneDrive//Desktop//Filippo//UniLNU//Primo_anno//Compiler//Assignment2//Github//compiler_parse_tree//ofp.g4 by ANTLR 4.13.1
+// Generated from /Users/amirhossein/University/4DT902-Compiler/Assignment_2/ofp.g4 by ANTLR 4.13.1
 
     package generated;
 

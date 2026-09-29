@@ -107,7 +107,12 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
 
         if(rhs == OFPType.ERROR || lhs == OFPType.ERROR){
             return OFPType.ERROR;
-        } else if(rhs != lhs) {
+
+        } else if(rhs != OFPType.INT && rhs != OFPType.FLOAT && rhs != OFPType.CHAR && lhs != OFPType.INT && lhs != OFPType.FLOAT && lhs != OFPType.CHAR){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
+            return OFPType.ERROR;}
+        else if(rhs != lhs) {
             errorCount++;
             System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
             return lhs;
@@ -147,4 +152,84 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             return OFPType.BOOL;
         }
     }
+
+    @Override 
+    public OFPType visitNegExpr(ofpParser.NegExprContext ctx) {
+        OFPType type = visit(ctx.getChild(1));
+        if(type == OFPType.ERROR){
+            return OFPType.ERROR;
+        } else if (type != OFPType.INT && type != OFPType.FLOAT) {
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found type: " + type);
+            return OFPType.ERROR;
+        } else {
+            return type;
+        }
+    }
+
+    @Override 
+    public OFPType visitParenExpr(ofpParser.ParenExprContext ctx) {
+        return visit(ctx.getChild(1));
+    }
+
+    @Override 
+    public OFPType visitWhileStmt(ofpParser.WhileStmtContext ctx) {
+        OFPType condition = visit(ctx.getChild(2));
+
+        if (condition == OFPType.ERROR){
+            visit(ctx.getChild(4));
+            return OFPType.ERROR;
+        } else if (condition != OFPType.BOOL) {
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Condition for while statement is not correct!");
+            visit(ctx.getChild(4));
+            return OFPType.ERROR;
+        } else {
+            visit(ctx.getChild(4));
+            return null;
+        }
+    }
+
+    @Override 
+    public OFPType visitIfStmt(ofpParser.IfStmtContext ctx){
+        OFPType condition = visit(ctx.getChild(2));
+        int numberOfChildren = ctx.getChildCount();
+
+        if (condition == OFPType.ERROR){
+            visit(ctx.getChild(4));
+            if (numberOfChildren == 7){
+                visit(ctx.getChild(6));
+            }
+            return OFPType.ERROR;
+        } else if (condition != OFPType.BOOL) {
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): If statement is not correct!");
+            if (numberOfChildren == 7){
+                visit(ctx.getChild(6));
+            }
+            visit(ctx.getChild(4));
+            return OFPType.ERROR;
+        } else {
+            visit(ctx.getChild(4));
+            if (numberOfChildren == 7){
+                visit(ctx.getChild(6));
+            }
+            return null;
+        }
+    }
+
+    @Override 
+    public OFPType visitPrintStmt(ofpParser.PrintStmtContext ctx){
+        OFPType printExpr = visit(ctx.getChild(2));
+        if (printExpr == OFPType.ERROR){
+            return OFPType.ERROR;
+        } else if (printExpr != OFPType.INT && printExpr != OFPType.FLOAT && printExpr != OFPType.BOOL && printExpr != OFPType.CHAR && printExpr != OFPType.STRING){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected INT, FLOAT, BOOL, CHAR or STRING but got: " + printExpr);
+            return OFPType.ERROR;
+        } else {
+            return null;
+        }
+    }
+
 } 
