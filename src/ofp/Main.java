@@ -40,9 +40,9 @@ public class Main  {
         System.out.println("\nParsing completed");
 
         ParseTreeWalker walker = new ParseTreeWalker();
-        PrintListener listener = new PrintListener();
-        walker.walk(listener, root);
-        System.out.println("\nPrint listener completed");
+        // PrintListener listener = new PrintListener();
+        // walker.walk(listener, root);
+        // System.out.println("\nPrint listener completed");
 
         SymbolTableListener symbolTableListener = new SymbolTableListener();
         walker.walk(symbolTableListener, root);
@@ -50,6 +50,12 @@ public class Main  {
         System.out.println("\nSymbol table listener error count: " + symbolTableListener.getErrorCount());
         OFPScope globalScope = symbolTableListener.getScopes().get(root);
         globalScope.printTree(0);
+
+        System.out.println("\nType check visitor started");
+        TypeCheckVisitor tc = new TypeCheckVisitor(symbolTableListener.getScopes());
+        tc.visit(root);
+        System.out.println("\nType check visitor completed");
+        System.out.println("\nType check visitor error count: " + tc.getErrorCount());
 
         // Trees.inspect(root, parser);
         
