@@ -315,6 +315,49 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         }
     }
 
+    @Override 
+    public OFPType visitVarDecl(ofpParser.VarDeclContext ctx){
+        String varTypeName = ctx.getChild(0).getText();
+        OFPType varType = OFPType.get(varTypeName);
+        int numOfChildren = ctx.getChildCount();
+        
+        if (numOfChildren < 4){
+            return varType;
+        } else {
+            OFPType varValueType = visit(ctx.getChild(3));
+            if (varValueType == OFPType.ERROR){
+                return null;
+            } else if (varValueType != varType){
+                errorCount++;
+                System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected type: " + varType + " but got: " + varValueType);
+                return OFPType.ERROR;
+            } else {
+                return varType;
+            }
+        }
+    }
+
+    @Override 
+    public OFPType visitArrayDecl(ofpParser.ArrayDeclContext ctx){
+        String arrayTypeName = ctx.getChild(0).getText() + "[]";
+        OFPType arrayType = OFPType.get(arrayTypeName);
+        int numOfChildren = ctx.getChildCount();
+        if (numOfChildren < 6){
+            return arrayType;
+        } else {
+            OFPType arraySizeType = visit(ctx.getChild(5));
+            if (arraySizeType == OFPType.ERROR){
+                return null;
+            } else if (arraySizeType != arrayType){
+                errorCount++;
+                System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected type: " + arrayType + " but got: " + arraySizeType);
+                return OFPType.ERROR;
+            } else {
+                return arrayType;
+            }
+        }
+    }
+
     /**
      * The array type that has the given type as its elements, e.g. INT -> INT_ARRAY.
      * OFP has no bool[] or string[], so every other type gives ERROR.
