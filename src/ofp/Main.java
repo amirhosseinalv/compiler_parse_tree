@@ -39,17 +39,34 @@ public class Main  {
         } 
         System.out.println("\nParsing completed");
 
+        //Print listener
         ParseTreeWalker walker = new ParseTreeWalker();
         PrintListener listener = new PrintListener();
         walker.walk(listener, root);
         System.out.println("\nPrint listener completed");
 
+        //Symbol table listener
         SymbolTableListener symbolTableListener = new SymbolTableListener();
         walker.walk(symbolTableListener, root);
         System.out.println("\nSymbol table listener completed");
         System.out.println("\nSymbol table listener error count: " + symbolTableListener.getErrorCount());
         OFPScope globalScope = symbolTableListener.getScopes().get(root);
         globalScope.printTree(0);
+
+        //Check ref Listener
+        CheckRefListener checkRefListener = new CheckRefListener(symbolTableListener.getScopes());
+        walker.walk(checkRefListener, root);
+        System.out.println("\nCheck reference listener completed");
+        System.out.println("Check reference error count: " + checkRefListener.getErrorCount());
+
+
+        //Final debugging
+        int totalErrors = symbolTableListener.getErrorCount() + checkRefListener.getErrorCount();
+        if(totalErrors > 0){
+            System.out.println(totalErrors + " total errors found");
+        } else{
+            System.out.println("No errors found");
+        }
 
         //Trees.inspect(root, parser);
         

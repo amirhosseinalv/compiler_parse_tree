@@ -16,12 +16,41 @@ public class SymbolTableListener extends ofpBaseListener {
     private ParseTreeProperty<OFPScope> scopes = new ParseTreeProperty<OFPScope>();
     private int errorCount = 0;
 
+
     @Override
     public void enterProgram(ofpParser.ProgramContext ctx) {
         // enclosing scope == null for the global/program scope
         currentScope = new OFPScope(null);
         scopes.put(ctx, currentScope);
     }
+
+
+    @Override 
+    public void enterMain(ofpParser.MainContext ctx) {
+        String functionName = "main";
+
+        //If main was already used in the global scope we won't add it to the map and report the error
+        if(currentScope.resolveLocally(functionName) != null){
+            errorCount++;
+            System.out.println("Error: Duplicate main function declaration");
+        } else{
+            String returnTypeName = "void";
+            OFPType returnType = OFPType.get(returnTypeName);
+            currentFunctionSymbol = new OFPFunctionSymbol(functionName, returnType);
+            currentScope.define(currentFunctionSymbol);
+        }
+        
+        //Either way we enter the main scope
+        currentScope = new OFPScope(currentScope);
+        scopes.put(ctx, currentScope);
+    }
+
+    @Override 
+    public void exitMain(ofpParser.MainContext ctx) {
+        currentScope = currentScope.getEnclosingScope();
+        currentFunctionSymbol = null; 
+    }
+
 
     @Override 
     public void enterFuncDecl(ofpParser.FuncDeclContext ctx) {
@@ -48,6 +77,7 @@ public class SymbolTableListener extends ofpBaseListener {
         currentScope = currentScope.getEnclosingScope();
         currentFunctionSymbol = null; // Reset the current function symbol when exiting the function declaration
     }
+
 
     @Override 
     public void enterValueParam(ofpParser.ValueParamContext ctx) {
@@ -93,50 +123,6 @@ public class SymbolTableListener extends ofpBaseListener {
         }
     }
 
-    @Override 
-    public void enterMain(ofpParser.MainContext ctx) {
-        String functionName = "main";
-
-        //If main was already used in the global scope we won't add it to the map and report the error
-        if(currentScope.resolveLocally(functionName) != null){
-            errorCount++;
-            System.out.println("Error: Duplicate main function declaration");
-        } else{
-            String returnTypeName = "void";
-            OFPType returnType = OFPType.get(returnTypeName);
-            currentFunctionSymbol = new OFPFunctionSymbol(functionName, returnType);
-            currentScope.define(currentFunctionSymbol);
-        }
-        
-        //Either way we enter the main scope
-        currentScope = new OFPScope(currentScope);
-        scopes.put(ctx, currentScope);
-    }
-
-    @Override 
-    public void exitMain(ofpParser.MainContext ctx) {
-        currentScope = currentScope.getEnclosingScope();
-        currentFunctionSymbol = null; 
-    }
-
-    @Override 
-    public void enterBlock(ofpParser.BlockContext ctx) {
-        if ((ctx.getParent() instanceof ofpParser.FuncDeclContext) || (ctx.getParent() instanceof ofpParser.MainContext)){
-            return;
-    }   else {
-            currentScope = new OFPScope(currentScope);
-            scopes.put(ctx, currentScope);
-        }
-    }
-
-    @Override 
-    public void exitBlock(ofpParser.BlockContext ctx){
-        if (ctx.getParent() instanceof ofpParser.MainContext || ctx.getParent() instanceof ofpParser.FuncDeclContext) {
-            return;
-        } else {
-            currentScope = currentScope.getEnclosingScope();
-        }
-    }
 
     @Override 
     public void enterVarDecl(ofpParser.VarDeclContext ctx){
@@ -172,6 +158,27 @@ public class SymbolTableListener extends ofpBaseListener {
         OFPSymbol arraySym = new OFPSymbol(arrayName, arrayType);
         currentScope.define(arraySym);
     }
+
+
+    @Override 
+    public void enterBlock(ofpParser.BlockContext ctx) {
+        if ((ctx.getParent() instanceof ofpParser.FuncDeclContext) || (ctx.getParent() instanceof ofpParser.MainContext)){
+            return;
+    }   else {
+            currentScope = new OFPScope(currentScope);
+            scopes.put(ctx, currentScope);
+        }
+    }
+
+    @Override 
+    public void exitBlock(ofpParser.BlockContext ctx){
+        if (ctx.getParent() instanceof ofpParser.MainContext || ctx.getParent() instanceof ofpParser.FuncDeclContext) {
+            return;
+        } else {
+            currentScope = currentScope.getEnclosingScope();
+        }
+    }
+
 
     public ParseTreeProperty<OFPScope> getScopes(){
         return scopes;
