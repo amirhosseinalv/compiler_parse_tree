@@ -1,5 +1,8 @@
 package ofp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 import generated.ofpBaseVisitor;
@@ -41,6 +44,7 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
     @Override 
     public OFPType visitMain(ofpParser.MainContext ctx){
         currentScope = scopes.get(ctx);
+        currentFunction = "main";
         visitChildren(ctx);
         currentScope = currentScope.getEnclosingScope();
         return null;
@@ -362,6 +366,152 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
      * The array type that has the given type as its elements, e.g. INT -> INT_ARRAY.
      * OFP has no bool[] or string[], so every other type gives ERROR.
      */
+    @Override
+    public OFPType visitAssignStmt(ofpParser.AssignStmtContext ctx){
+        // ID '=' expr ';'
+        String varName = ctx.getChild(0).getText();
+        OFPSymbol varSym = currentScope.resolve(varName);
+        OFPType valueType = visit(ctx.getChild(2));
+
+        // Undeclared names are reported by the CheckRefListener, not here
+        if (varSym == null || valueType == OFPType.ERROR){
+            return null;
+        }
+        if (varSym.getType() != valueType){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Cannot assign " + valueType
+                    + " to '" + varName + "' of type " + varSym.getType() + " in function " + currentFunction);
+        }
+        return null;
+    }
+
+    @Override
+    public OFPType visitArrayAssignStmt(ofpParser.ArrayAssignStmtContext ctx){
+        // ID '[' expr ']' '=' expr ';'
+        String arrayName = ctx.getChild(0).getText();
+        OFPSymbol arraySym = currentScope.resolve(arrayName);
+        OFPType indexType = visit(ctx.getChild(2));
+        OFPType valueType = visit(ctx.getChild(5));
+
+        if (arraySym == null){
+            return null;
+        }
+        // The target must be something we can index, and the index itself must be an int
+        OFPType elementType = elementType(arraySym.getType());
+        if (elementType == null){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): '" + arrayName
+                    + "' has type " + arraySym.getType() + " and cannot be indexed");
+            return null;
+        }
+        if (indexType != OFPType.ERROR && indexType != OFPType.INT){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Array index must be int but got: " + indexType);
+        }
+        if (valueType != OFPType.ERROR && valueType != elementType){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Cannot assign " + valueType
+                    + " to an element of " + arraySym.getType());
+        }
+        return null;
+    }
+
+    @Override
+    public OFPType visitReturnStmt(ofpParser.ReturnStmtContext ctx){
+        // 'return' expr? ';'
+        OFPType declaredType = currentFunctionReturnType();
+
+        if (ctx.getChildCount() == 2){          // return;
+            if (declaredType != null && declaredType != OFPType.VOID){
+                errorCount++;
+                System.out.println("Error (line " + ctx.getStart().getLine() + "): Function " + currentFunction
+                        + " must return " + declaredType);
+            }
+            return null;
+        }
+
+        OFPType returnedType = visit(ctx.getChild(1));   // return expr;
+        if (returnedType == OFPType.ERROR || declaredType == null){
+            return null;
+        }
+        if (declaredType == OFPType.VOID){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Void function " + currentFunction
+                    + " cannot return a value");
+        } else if (returnedType != declaredType){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Function " + currentFunction
+                    + " must return " + declaredType + " but got: " + returnedType);
+        }
+        return null;
+    }
+
+    @Override
+    public OFPType visitFuncCall(ofpParser.FuncCallContext ctx){
+        // ID '(' (expr (',' expr)*)? ')'
+        String funcName = ctx.getChild(0).getText();
+
+        // The arguments are always visited, so errors inside them are reported too
+        List<OFPType> argTypes = new ArrayList<>();
+        for (int i = 2; i < ctx.getChildCount() - 1; i += 2){
+            argTypes.add(visit(ctx.getChild(i)));
+        }
+
+        // Functions live in the global scope, so a local variable cannot hide them
+        OFPSymbol sym = globalScope.resolve(funcName);
+        if (!(sym instanceof OFPFunctionSymbol)){
+            return OFPType.ERROR;      // undeclared function: reported by the CheckRefListener
+        }
+        OFPFunctionSymbol funcSym = (OFPFunctionSymbol) sym;
+        List<OFPType> paramTypes = funcSym.getParamTypes();
+
+        if (argTypes.size() != paramTypes.size()){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Function " + funcName
+                    + " takes " + paramTypes.size() + " argument(s) but got " + argTypes.size());
+            return funcSym.getType();
+        }
+        for (int i = 0; i < paramTypes.size(); i++){
+            OFPType argType = argTypes.get(i);
+            if (argType != OFPType.ERROR && argType != paramTypes.get(i)){
+                errorCount++;
+                System.out.println("Error (line " + ctx.getStart().getLine() + "): Argument " + (i + 1)
+                        + " of " + funcName + " must be " + paramTypes.get(i) + " but got: " + argType);
+            }
+        }
+        return funcSym.getType();       // a call has the function's return type
+    }
+
+    @Override
+    public OFPType visitCallExpr(ofpParser.CallExprContext ctx){
+        return visit(ctx.getChild(0));  // the funcCall child carries the type
+    }
+
+    /** The declared return type of the function being visited, or null if it cannot be found */
+    private OFPType currentFunctionReturnType(){
+        OFPSymbol sym = globalScope.resolve(currentFunction);
+        if (sym instanceof OFPFunctionSymbol){
+            return sym.getType();
+        }
+        return null;
+    }
+
+    /**
+     * The type of the elements of an indexable type, e.g. INT_ARRAY -> INT.
+     * Returns null for types that cannot be indexed at all.
+     */
+    private OFPType elementType(OFPType type){
+        if (type == OFPType.INT_ARRAY){
+            return OFPType.INT;
+        } else if (type == OFPType.FLOAT_ARRAY){
+            return OFPType.FLOAT;
+        } else if (type == OFPType.CHAR_ARRAY || type == OFPType.STRING){
+            return OFPType.CHAR;
+        } else {
+            return null;
+        }
+    }
+
     private OFPType arrayOf(OFPType elementType){
         if (elementType == OFPType.INT){
             return OFPType.INT_ARRAY;
