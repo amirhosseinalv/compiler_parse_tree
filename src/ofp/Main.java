@@ -18,7 +18,7 @@ public class Main  {
 
     public static void main(String[] args)  {
         System.out.println(OFPType.INT);
-        String testProgram = args.length > 0 ? args[0] : "test.ofp";
+        String testProgram = args.length > 0 ? args[0] : "test_duplicates.ofp";
         
         if ( !testProgram.endsWith(".ofp") ) {
             System.out.println("\nPrograms most end with suffix .ofp! Found "+testProgram);
@@ -41,9 +41,9 @@ public class Main  {
 
         //Print listener
         ParseTreeWalker walker = new ParseTreeWalker();
-        PrintListener listener = new PrintListener();
-        walker.walk(listener, root);
-        System.out.println("\nPrint listener completed");
+        // PrintListener listener = new PrintListener();
+        // walker.walk(listener, root);
+        // System.out.println("\nPrint listener completed");
 
         //Symbol table listener
         SymbolTableListener symbolTableListener = new SymbolTableListener();
@@ -59,16 +59,14 @@ public class Main  {
         System.out.println("\nCheck reference listener completed");
         System.out.println("Check reference error count: " + checkRefListener.getErrorCount());
 
+        //Type check visitor
+        System.out.println("\nType check visitor started");
+        TypeCheckVisitor tc = new TypeCheckVisitor(symbolTableListener.getScopes());
+        tc.visit(root);
+        System.out.println("\nType check visitor completed");
+        System.out.println("\nType check visitor error count: " + tc.getErrorCount());
 
-        //Final debugging
-        int totalErrors = symbolTableListener.getErrorCount() + checkRefListener.getErrorCount();
-        if(totalErrors > 0){
-            System.out.println(totalErrors + " total errors found");
-        } else{
-            System.out.println("No errors found");
-        }
-
-        //Trees.inspect(root, parser);
+        // Trees.inspect(root, parser);
         
     }
 }

@@ -22,6 +22,7 @@ public class OFPType {
     public static final OFPType INT_ARRAY = new OFPType("int[]");
     public static final OFPType FLOAT_ARRAY = new OFPType("float[]");
     public static final OFPType CHAR_ARRAY = new OFPType("char[]");
+    public static final OFPType ERROR = new OFPType("error");
 
 
     private OFPType(String name) {
