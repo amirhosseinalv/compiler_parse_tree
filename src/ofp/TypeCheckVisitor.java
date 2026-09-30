@@ -232,4 +232,102 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         }
     }
 
+    @Override 
+    public OFPType visitLengthExpr(ofpParser.LengthExprContext ctx){
+        OFPType arrayLengthExpr = visit(ctx.getChild(0));
+        if (arrayLengthExpr == OFPType.ERROR){
+            return OFPType.ERROR;
+        } else if (arrayLengthExpr != OFPType.STRING && arrayLengthExpr != OFPType.CHAR_ARRAY && arrayLengthExpr != OFPType.INT_ARRAY && arrayLengthExpr != OFPType.FLOAT_ARRAY){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected STRING, CHAR_ARRAY, INT_ARRAY or FLOAT_ARRAY but got: " + arrayLengthExpr);
+            return OFPType.ERROR;
+        } else {
+            return OFPType.INT;
+        }
+    }
+
+
+    @Override 
+    public OFPType visitIndexExpr(ofpParser.IndexExprContext ctx){
+        OFPType indexExpr = visit(ctx.getChild(0));
+        OFPType index = visit(ctx.getChild(2));
+        if (indexExpr == OFPType.ERROR || index == OFPType.ERROR){
+            return OFPType.ERROR;
+        } else if (indexExpr != OFPType.STRING && indexExpr != OFPType.CHAR_ARRAY && indexExpr != OFPType.INT_ARRAY && indexExpr != OFPType.FLOAT_ARRAY){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected STRING but got: " + indexExpr);
+            return OFPType.ERROR;
+        } else if (index != OFPType.INT){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected INT but got: " + index);
+            return OFPType.ERROR;
+        } else {
+            if (indexExpr == OFPType.STRING || indexExpr == OFPType.CHAR_ARRAY){
+                return OFPType.CHAR;
+            } else if (indexExpr == OFPType.INT_ARRAY){
+                return OFPType.INT;
+            } else if (indexExpr == OFPType.FLOAT_ARRAY){
+                return OFPType.FLOAT;
+            }
+            return null;
+        }
+    }
+
+    @Override 
+    public OFPType visitNewArrayExpr(ofpParser.NewArrayExprContext ctx){
+       String arrayTypeName = ctx.getChild(1).getText() + "[]";
+       OFPType arrayType = OFPType.get(arrayTypeName);
+       OFPType arraySize = visit(ctx.getChild(3));
+         if (arraySize == OFPType.ERROR ){
+            return OFPType.ERROR;
+        } else if (arraySize != OFPType.INT){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected INT but got: " + arraySize);
+            return OFPType.ERROR;
+        }
+         else {
+            return arrayType;   
+
+    }}
+
+    @Override 
+    public OFPType visitArrayLiteralExpr(ofpParser.ArrayLiteralExprContext ctx){
+        int numOfElements = ctx.getChildCount();
+        if (numOfElements == 2){
+            return null;
+        } else {
+            OFPType firstElementType = visit(ctx.getChild(1));
+            for (int i = 1; i < numOfElements - 1; i+=2){
+                OFPType elementType = visit(ctx.getChild(i));
+                if (elementType == OFPType.ERROR){
+                    return OFPType.ERROR;
+                } else if (elementType != OFPType.INT && elementType != OFPType.FLOAT && elementType != OFPType.CHAR){
+                    errorCount++;
+                    System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected INT, FLOAT or CHAR but got: " + elementType);
+                    return OFPType.ERROR;
+                } else if (elementType != firstElementType){
+                    errorCount++;
+                    System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected all elements to be of the same type but got: " + elementType + " and " + visit(ctx.getChild(1)));
+                    return OFPType.ERROR;
+                }
+            }
+            return arrayOf(firstElementType);
+        }
+    }
+
+    /**
+     * The array type that has the given type as its elements, e.g. INT -> INT_ARRAY.
+     * OFP has no bool[] or string[], so every other type gives ERROR.
+     */
+    private OFPType arrayOf(OFPType elementType){
+        if (elementType == OFPType.INT){
+            return OFPType.INT_ARRAY;
+        } else if (elementType == OFPType.FLOAT){
+            return OFPType.FLOAT_ARRAY;
+        } else if (elementType == OFPType.CHAR){
+            return OFPType.CHAR_ARRAY;
+        } else {
+            return OFPType.ERROR;
+        }
+    }
 } 
