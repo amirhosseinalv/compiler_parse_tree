@@ -39,11 +39,13 @@ public class Main  {
         } 
         System.out.println("\nParsing completed");
 
+        //Print listener
         ParseTreeWalker walker = new ParseTreeWalker();
         // PrintListener listener = new PrintListener();
         // walker.walk(listener, root);
         // System.out.println("\nPrint listener completed");
 
+        //Symbol table listener
         SymbolTableListener symbolTableListener = new SymbolTableListener();
         walker.walk(symbolTableListener, root);
         System.out.println("\nSymbol table listener completed");
@@ -51,6 +53,13 @@ public class Main  {
         OFPScope globalScope = symbolTableListener.getScopes().get(root);
         globalScope.printTree(0);
 
+        //Check ref Listener
+        CheckRefListener checkRefListener = new CheckRefListener(symbolTableListener.getScopes());
+        walker.walk(checkRefListener, root);
+        System.out.println("\nCheck reference listener completed");
+        System.out.println("Check reference error count: " + checkRefListener.getErrorCount());
+
+        //Type check visitor
         System.out.println("\nType check visitor started");
         TypeCheckVisitor tc = new TypeCheckVisitor(symbolTableListener.getScopes());
         tc.visit(root);

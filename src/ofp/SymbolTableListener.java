@@ -156,6 +156,27 @@ public class SymbolTableListener extends ofpBaseListener {
         define(new OFPSymbol(arrayName, arrayType), "array variable", ctx);
     }
 
+
+    @Override 
+    public void enterBlock(ofpParser.BlockContext ctx) {
+        if ((ctx.getParent() instanceof ofpParser.FuncDeclContext) || (ctx.getParent() instanceof ofpParser.MainContext)){
+            return;
+    }   else {
+            currentScope = new OFPScope(currentScope);
+            scopes.put(ctx, currentScope);
+        }
+    }
+
+    @Override 
+    public void exitBlock(ofpParser.BlockContext ctx){
+        if (ctx.getParent() instanceof ofpParser.MainContext || ctx.getParent() instanceof ofpParser.FuncDeclContext) {
+            return;
+        } else {
+            currentScope = currentScope.getEnclosingScope();
+        }
+    }
+
+
     public ParseTreeProperty<OFPScope> getScopes(){
         return scopes;
     }
