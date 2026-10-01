@@ -83,7 +83,7 @@ public class CheckRefListener extends ofpBaseListener{
         String varName = ctx.getChild(0).getText();
         if(currentScope.resolve(varName) == null){
             errorCount++;
-            System.out.println("Error: Undeclared '" + varName + "' variable used in '" + currentFunction + "' function");
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Undeclared '" + varName + "' variable used in '" + currentFunction + "' function");
         }
     }
 
@@ -93,7 +93,7 @@ public class CheckRefListener extends ofpBaseListener{
         String arrayName = ctx.getChild(0).getText();
         if(currentScope.resolve(arrayName) == null){
             errorCount++;
-            System.out.println("Error: Undeclared '" + arrayName + "' array variable used in '" + currentFunction + "' function");
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Undeclared '" + arrayName + "' array variable used in '" + currentFunction + "' function");
         }
     }
 
@@ -103,7 +103,7 @@ public class CheckRefListener extends ofpBaseListener{
         String varName = ctx.getChild(0).getText();
         if(currentScope.resolve(varName) == null){
             errorCount++;
-            System.out.println("Error: Undeclared '" + varName + "' variable used in expression in '" + currentFunction + "' function");
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Undeclared '" + varName + "' variable used in expression in '" + currentFunction + "' function");
         }
     }
 
@@ -114,7 +114,7 @@ public class CheckRefListener extends ofpBaseListener{
         OFPSymbol sym = globalScope.resolve(funcName);
         if((sym == null) || !(sym instanceof OFPFunctionSymbol)){
             errorCount++;
-            System.out.println("Error: Undeclared '" + funcName + "' function call");
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Undeclared '" + funcName + "' function call");
         }
     }
 
