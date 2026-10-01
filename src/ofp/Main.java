@@ -51,7 +51,9 @@ public class Main  {
         System.out.println("\nSymbol table listener completed");
         System.out.println("\nSymbol table listener error count: " + symbolTableListener.getErrorCount());
         OFPScope globalScope = symbolTableListener.getScopes().get(root);
-        globalScope.printTree(0);
+        System.out.println("\nSymbol Table:");
+        globalScope.printSymbolTable(0);
+        // globalScope.printTree(0);   // the older, raw print of each scope's map
 
         //Check ref Listener
         CheckRefListener checkRefListener = new CheckRefListener(symbolTableListener.getScopes());

@@ -57,6 +57,7 @@ public class SymbolTableListener extends ofpBaseListener {
 
         // Either way we enter the function scope
         currentScope = new OFPScope(currentScope);
+        currentScope.setScopeName("function " + functionName);
         scopes.put(ctx, currentScope);
     }
 
@@ -103,6 +104,7 @@ public class SymbolTableListener extends ofpBaseListener {
 
         // Either way we enter the main scope
         currentScope = new OFPScope(currentScope);
+        currentScope.setScopeName("function main");
         scopes.put(ctx, currentScope);
     }
 

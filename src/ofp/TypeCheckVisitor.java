@@ -96,8 +96,8 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         OFPSymbol symbol = currentScope.resolve(id);
         if(symbol == null){
             // TOCHECK: check if filippo is handeling this error in a different way, if not, we should handle it here
-            // System.err.println("Error: Variable " + id + " is not declared.");
-            // errorCount++;
+            System.out.println("Error: Variable " + id + " is not declared.");
+            errorCount++;
             return OFPType.ERROR;
         } else {
             return symbol.getType();
