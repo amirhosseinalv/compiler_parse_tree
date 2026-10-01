@@ -146,15 +146,21 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         OFPType lhs = visit(ctx.getChild(0));
         OFPType rhs = visit(ctx.getChild(2));
 
+        String operator = ctx.getChild(1).getText();   // "<", ">" or "=="
+
         if(rhs == OFPType.ERROR || lhs == OFPType.ERROR){
             return OFPType.ERROR;
         } else if(rhs != lhs) {
             errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
-            return OFPType.BOOL;
-        } else {
-            return OFPType.BOOL;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Cannot compare " + lhs
+                    + " with " + rhs + " using '" + operator + "' in function " + currentFunction);
+        } else if(lhs != OFPType.INT && lhs != OFPType.FLOAT && lhs != OFPType.CHAR) {
+            // Both sides agree, but OFP only compares char, int and float
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Operator '" + operator
+                    + "' cannot be used on " + lhs + " in function " + currentFunction);
         }
+        return OFPType.BOOL;   // a comparison is always a bool, even after an error
     }
 
     @Override 
