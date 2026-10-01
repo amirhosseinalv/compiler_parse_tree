@@ -66,6 +66,18 @@ public class Main  {
         System.out.println("\nType check visitor completed");
         System.out.println("\nType check visitor error count: " + tc.getErrorCount());
 
+        // Total over all three analysis phases. Zero errors => the program is valid.
+        int totalErrors = symbolTableListener.getErrorCount()
+                + checkRefListener.getErrorCount()
+                + tc.getErrorCount();
+        System.out.println("\n=====================================");
+        if (totalErrors == 0) {
+            System.out.println("Semantic analysis completed: no errors found");
+        } else {
+            System.out.println("Semantic analysis completed: " + totalErrors + " error(s) found");
+        }
+        System.out.println("=====================================");
+
         // Trees.inspect(root, parser);
         
     }
