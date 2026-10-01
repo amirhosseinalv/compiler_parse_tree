@@ -3,6 +3,7 @@ package ofp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 import generated.ofpBaseVisitor;
@@ -109,20 +110,44 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         OFPType lhs = visit(ctx.getChild(0));
         OFPType rhs = visit(ctx.getChild(2));
 
-        if(rhs == OFPType.ERROR || lhs == OFPType.ERROR){
-            return OFPType.ERROR;
+        return checkArithmetic(lhs, rhs, ctx.getChild(1).getText(), ctx);
+    }
 
-        } else if(rhs != OFPType.INT && rhs != OFPType.FLOAT && rhs != OFPType.CHAR && lhs != OFPType.INT && lhs != OFPType.FLOAT && lhs != OFPType.CHAR){
-            errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
-            return OFPType.ERROR;}
-        else if(rhs != lhs) {
-            errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
-            return lhs;
-        } else {
-            return rhs;
+    /**
+     * True if the two operands of a comparison may have this type. The OFP definition
+     * gives &lt; and &gt; standard semantics for integers and decimals, and allows ==
+     * on characters as well (but never on strings, bools or arrays).
+     */
+    private boolean canCompare(OFPType type, String operator){
+        if (type == OFPType.INT || type == OFPType.FLOAT){
+            return true;
         }
+        return type == OFPType.CHAR && operator.equals("==");
+    }
+
+    /**
+     * The shared rule for + - * / : both operands must have the same type, and OFP
+     * only does arithmetic on int and float (no string concatenation, no char math).
+     * Returns the type of the expression.
+     */
+    private OFPType checkArithmetic(OFPType lhs, OFPType rhs, String operator, ParserRuleContext ctx){
+        if(lhs == OFPType.ERROR || rhs == OFPType.ERROR){
+            return OFPType.ERROR;
+        }
+        if(lhs != rhs){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Operator '" + operator
+                    + "' needs operands of the same type but got: " + lhs + " and " + rhs
+                    + " in function " + currentFunction);
+            return lhs;
+        }
+        if(lhs != OFPType.INT && lhs != OFPType.FLOAT){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Operator '" + operator
+                    + "' cannot be used on " + lhs + " in function " + currentFunction);
+            return OFPType.ERROR;
+        }
+        return lhs;
     }
 
     @Override 
@@ -130,18 +155,10 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         OFPType lhs = visit(ctx.getChild(0));
         OFPType rhs = visit(ctx.getChild(2));
 
-        if(rhs == OFPType.ERROR || lhs == OFPType.ERROR){
-            return OFPType.ERROR;
-        } else if(rhs != lhs) {
-            errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found lhs type: " + lhs + "rhs: " + rhs);
-            return lhs;
-        } else {
-            return rhs;
-        }
+        return checkArithmetic(lhs, rhs, ctx.getChild(1).getText(), ctx);
     }
 
-    @Override 
+    @Override
     public OFPType visitCompareExpr(ofpParser.CompareExprContext ctx) {
         OFPType lhs = visit(ctx.getChild(0));
         OFPType rhs = visit(ctx.getChild(2));
@@ -154,8 +171,9 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             errorCount++;
             System.out.println("Error (line " + ctx.getStart().getLine() + "): Cannot compare " + lhs
                     + " with " + rhs + " using '" + operator + "' in function " + currentFunction);
-        } else if(lhs != OFPType.INT && lhs != OFPType.FLOAT && lhs != OFPType.CHAR) {
-            // Both sides agree, but OFP only compares char, int and float
+        } else if(!canCompare(lhs, operator)) {
+            // Both sides agree, but < and > only work on int and float,
+            // and == also works on char (but never on string, bool or arrays)
             errorCount++;
             System.out.println("Error (line " + ctx.getStart().getLine() + "): Operator '" + operator
                     + "' cannot be used on " + lhs + " in function " + currentFunction);
