@@ -41,9 +41,9 @@ public class Main  {
 
         //Print listener
         ParseTreeWalker walker = new ParseTreeWalker();
-        // PrintListener listener = new PrintListener();
-        // walker.walk(listener, root);
-        // System.out.println("\nPrint listener completed");
+        PrintListener listener = new PrintListener();
+        walker.walk(listener, root);
+        System.out.println("\nPrint listener completed");
 
         //Symbol table listener
         SymbolTableListener symbolTableListener = new SymbolTableListener();
@@ -78,7 +78,7 @@ public class Main  {
         }
         System.out.println("=====================================");
 
-        // Trees.inspect(root, parser);
+        Trees.inspect(root, parser);
         
     }
 }
