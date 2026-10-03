@@ -1,5 +1,6 @@
 # Test program for duplicate declarations (based on lecture 2, slide 4)
-# Expected: 5 errors, on lines 11, 14, 24, 27 and 34
+# Expected: 5 duplicate errors (lines 11, 14, 26, 30, 36), plus one follow-on
+# type error on line 27: the duplicate funcA body is checked against the first funcA.
 
 int funcA(int paramA) {
 	int ok = 1;

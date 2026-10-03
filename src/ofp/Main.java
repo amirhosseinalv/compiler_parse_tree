@@ -17,8 +17,7 @@ import generated.ofpParser;
 public class Main  {
 
     public static void main(String[] args)  {
-        System.out.println(OFPType.INT);
-        String testProgram = args.length > 0 ? args[0] : "test_duplicates.ofp";
+        String testProgram = args.length > 0 ? args[0] : "test.ofp";
         
         if ( !testProgram.endsWith(".ofp") ) {
             System.out.println("\nPrograms most end with suffix .ofp! Found "+testProgram);
@@ -41,9 +40,10 @@ public class Main  {
 
         //Print listener
         ParseTreeWalker walker = new ParseTreeWalker();
-        PrintListener listener = new PrintListener();
-        walker.walk(listener, root);
-        System.out.println("\nPrint listener completed");
+        // Uncomment to print every parse tree node type (debug aid, very verbose)
+        // PrintListener listener = new PrintListener();
+        // walker.walk(listener, root);
+        // System.out.println("\nPrint listener completed");
 
         //Symbol table listener
         SymbolTableListener symbolTableListener = new SymbolTableListener();
@@ -80,7 +80,7 @@ public class Main  {
         }
         System.out.println("=====================================");
 
-        Trees.inspect(root, parser);
+        // Trees.inspect(root, parser);   // opens a GUI window and BLOCKS until closed
         
     }
 }

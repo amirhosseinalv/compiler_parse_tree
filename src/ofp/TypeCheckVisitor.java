@@ -94,14 +94,20 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
     public OFPType visitIdExpr(ofpParser.IdExprContext ctx){
         String id = ctx.getChild(0).getText();
         OFPSymbol symbol = currentScope.resolve(id);
+
+        // Undeclared names are reported by the CheckRefListener (phase 3). Returning
+        // ERROR without a message keeps one mistake to one line of output.
         if(symbol == null){
-            // TOCHECK: check if filippo is handeling this error in a different way, if not, we should handle it here
-            System.out.println("Error: Variable " + id + " is not declared.");
-            errorCount++;
             return OFPType.ERROR;
-        } else {
-            return symbol.getType();
         }
+        // A function name is not a value: "int x = addInts;" has no meaning in OFP
+        if(symbol instanceof OFPFunctionSymbol){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): '" + id
+                    + "' is a function and cannot be used as a value in function " + currentFunction);
+            return OFPType.ERROR;
+        }
+        return symbol.getType();
     }
 
 
@@ -139,7 +145,8 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             System.out.println("Error (line " + ctx.getStart().getLine() + "): Operator '" + operator
                     + "' needs operands of the same type but got: " + lhs + " and " + rhs
                     + " in function " + currentFunction);
-            return lhs;
+            // ERROR, not lhs: otherwise "if (1 + true)" would also report a bad condition
+            return OFPType.ERROR;
         }
         if(lhs != OFPType.INT && lhs != OFPType.FLOAT){
             errorCount++;
@@ -188,7 +195,7 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             return OFPType.ERROR;
         } else if (type != OFPType.INT && type != OFPType.FLOAT) {
             errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Type mismatch! Found type: " + type);
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Unary '-' needs an int or a float but got: " + type + " in function " + currentFunction);
             return OFPType.ERROR;
         } else {
             return type;
@@ -209,7 +216,7 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             return OFPType.ERROR;
         } else if (condition != OFPType.BOOL) {
             errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Condition for while statement is not correct!");
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): While condition must be bool but got: " + condition + " in function " + currentFunction);
             visit(ctx.getChild(4));
             return OFPType.ERROR;
         } else {
@@ -231,7 +238,7 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             return OFPType.ERROR;
         } else if (condition != OFPType.BOOL) {
             errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): If statement is not correct!");
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): If condition must be bool but got: " + condition + " in function " + currentFunction);
             if (numberOfChildren == 7){
                 visit(ctx.getChild(6));
             }
@@ -267,7 +274,7 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             return OFPType.ERROR;
         } else if (arrayLengthExpr != OFPType.STRING && arrayLengthExpr != OFPType.CHAR_ARRAY && arrayLengthExpr != OFPType.INT_ARRAY && arrayLengthExpr != OFPType.FLOAT_ARRAY){
             errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected STRING, CHAR_ARRAY, INT_ARRAY or FLOAT_ARRAY but got: " + arrayLengthExpr);
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): .length needs an array or a string but got: " + arrayLengthExpr + " in function " + currentFunction);
             return OFPType.ERROR;
         } else {
             return OFPType.INT;
@@ -283,7 +290,7 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
             return OFPType.ERROR;
         } else if (indexExpr != OFPType.STRING && indexExpr != OFPType.CHAR_ARRAY && indexExpr != OFPType.INT_ARRAY && indexExpr != OFPType.FLOAT_ARRAY){
             errorCount++;
-            System.out.println("Error (line " + ctx.getStart().getLine() + "): Expected STRING but got: " + indexExpr);
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): [] needs an array or a string but got: " + indexExpr + " in function " + currentFunction);
             return OFPType.ERROR;
         } else if (index != OFPType.INT){
             errorCount++;
@@ -322,7 +329,11 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
     public OFPType visitArrayLiteralExpr(ofpParser.ArrayLiteralExprContext ctx){
         int numOfElements = ctx.getChildCount();
         if (numOfElements == 2){
-            return null;
+            // "{}" has no elements, so there is no element type to infer
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine()
+                    + "): An empty array literal has no type, in function " + currentFunction);
+            return OFPType.ERROR;
         } else {
             OFPType firstElementType = visit(ctx.getChild(1));
             for (int i = 1; i < numOfElements - 1; i+=2){
@@ -401,6 +412,13 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         if (varSym == null || valueType == OFPType.ERROR){
             return null;
         }
+        // A function name is not a variable, so it cannot be assigned to
+        if (varSym instanceof OFPFunctionSymbol){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): '" + varName
+                    + "' is a function and cannot be assigned to in function " + currentFunction);
+            return null;
+        }
         if (varSym.getType() != valueType){
             errorCount++;
             System.out.println("Error (line " + ctx.getStart().getLine() + "): Cannot assign " + valueType
@@ -418,6 +436,13 @@ public class TypeCheckVisitor extends ofpBaseVisitor<OFPType> {
         OFPType valueType = visit(ctx.getChild(5));
 
         if (arraySym == null){
+            return null;
+        }
+        // Strings are immutable in OFP: s[0] = 'j' is not allowed, although s[0] may be read
+        if (arraySym.getType() == OFPType.STRING){
+            errorCount++;
+            System.out.println("Error (line " + ctx.getStart().getLine() + "): Strings are immutable, cannot assign to '"
+                    + arrayName + "[...]' in function " + currentFunction);
             return null;
         }
         // The target must be something we can index, and the index itself must be an int
